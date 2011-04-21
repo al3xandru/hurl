@@ -8,23 +8,23 @@ var Hurl = {
       // indicate inputs using defaults
       self.addClass('defaulted')
 
-		  if (self.val() === '' || self.val() === title) {
-			  self.val(title).css('color', '#E9EAEA')
-		  } else {
-				self.addClass('focused')
+      if (self.val() === '' || self.val() === title) {
+        self.val(title).css('color', '#E9EAEA')
+      } else {
+        self.addClass('focused')
       }
 
-		  self.focus(function() {
-			  if (self.val() === title) {
-				  self.val('').addClass('focused').css('color', '#333')
-			  }
-		  })
+      self.focus(function() {
+          if (self.val() === title) {
+              self.val('').addClass('focused').css('color', '#333')
+          }
+      })
 
-		  self.blur(function() {
-			  if (self.val() === '') {
-				  self.val(title).removeClass('focused').css('color', '#E9EAEA')
-			  }
-		  })
+      self.blur(function() {
+          if (self.val() === '') {
+              self.val(title).removeClass('focused').css('color', '#E9EAEA')
+          }
+      })
     })
   },
 
@@ -46,49 +46,6 @@ var Hurl = {
       data.push( keepers[key] )
 
     return true
-  },
-
-  pony: function() {
-    if (!this.ponyLoaded) return this.loadPony()
-    if (this.ponying) return
-    this.ponying = true
-
-    var width = 668
-
-    var pony = $("<div />").css({
-      width:       width,
-      height:      422,
-      background: 'url(/img/pony.png) top center',
-      position:   'fixed',
-      bottom:     0,
-      right:      0-width,
-      "z-index":  1000,
-      cursor:     'pointer'
-    }).appendTo($("body"))
-
-    pony.show().animate({right: 0}, 1500, function() {
-      setTimeout(function() {
-        pony.css('background', 'url(/img/pony-hurl.png) top center')
-        setTimeout(function() {
-          pony.animate({right: 0-width}, 1500, function() {
-            Hurl.ponying = false
-          })
-        }, 500)
-      }, 1000)
-    })
-  },
-
-  loadPony: function() {
-    $(new Image()).load(function() {
-      Hurl.loadOtherPony()
-    }).attr('src', '/img/pony.png');
-  },
-
-  loadOtherPony: function() {
-    $(new Image()).load(function() {
-      Hurl.ponyLoaded = true
-      Hurl.pony()
-    }).attr('src', '/img/pony-hurl.png');
   }
 }
 
@@ -103,15 +60,15 @@ $(document).ready(function() {
   // select method
   $('#select-method').change(function() {
     $('#select-method option:selected').each(function() {
-      var method = $(this).attr('value')
+      var method = $(this).attr('value');
       if (method == 'POST' || method == 'PUT'){
         $('#post-params').show()
       } else {
         $('#post-params').hide()
       }
     })
-  })
-  $('#select-method').change()
+  });
+  $('#select-method').change();
 
   // add auth
   $('input[name=auth]').change(function() {
@@ -121,7 +78,7 @@ $(document).ready(function() {
     } else {
       $('#basic-auth-fields').hide()
     }
-  })
+  });
   $('#auth-selection :checked').change()
 
   // add post param
@@ -141,7 +98,7 @@ $(document).ready(function() {
     registerRemoveHandlers( newField, '.param-delete' )
     $(this).parent().append( newField )
     return false
-  })
+  });
 
   // set post body
   $('#set-post-body').click(function() {
@@ -168,7 +125,7 @@ $(document).ready(function() {
   $('#add-header').click(function() {
     var newField = $('#header-fields').clone()
     newField.toggle().attr('id', '')
-    newField.find('.form-alpha').hurlHeaders()
+    newField.find('input.form-alpha').hurlHeaders();
     newField.find('.form-alpha').attr('title', 'name')
     newField.find('.form-beta').attr('title', 'value')
     Hurl.labelHints( newField.find('input[title]') )
@@ -211,7 +168,8 @@ $(document).ready(function() {
         $('.permalink').attr('href', '/hurls/'+data.hurl_id+'/'+data.view_id)
         $('.full-size-link').attr('href', '/views/' + data.view_id)
         $('#request').html(data.request)
-        $('#response').html('<pre>' + data.header + '</pre>' + data.body)
+
+        $('#response').append('<pre>' + data.header + '</pre>').append($("<div></div>").text(data.body))
         $('.help-blurb').hide()
         $('#request-and-response').show()
       } else {
@@ -247,11 +205,13 @@ $(document).ready(function() {
   })
 
   // facebox
-  $('a[rel*=facebox]').facebox({ opacity: 0.4 })
-  $(document).bind('reveal.facebox', function() {
-    Hurl.labelHints('#facebox input[title]')
-    $('#facebox .footer').remove()
-  })
+  if($.facebox) {
+      $('a[rel*=facebox]').facebox({ opacity: 0.4 })
+      $(document).bind('reveal.facebox', function() {
+        Hurl.labelHints('#facebox input[title]')
+        $('#facebox .footer').remove()
+      })
+  }
 
   // in-field labels
 	Hurl.labelHints('input[title]')
