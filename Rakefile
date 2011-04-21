@@ -46,8 +46,10 @@ task :bundle do
   system "bundle install"
   rm "public/js/bundle.js"   rescue nil # >:O
   rm "public/css/bundle.css" rescue nil
-  system "cat $(ls -1 public/js/*.js | grep -v jquery.js) | uglifyjs -nc > public/js/bundle.js"
-  system "uglifycss public/css/*.css > public/css/bundle.css"
+#  system "cat $(ls -1 public/js/*.js | grep -v jquery.js) | uglifyjs -nc > public/js/bundle.js"
+#  system "uglifycss public/css/*.css > public/css/bundle.css"
+  system "cat $(ls -1 public/js/*.js | grep -v jquery.js | grep -v facebox.js) > public/js/bundle.js"
+  system "cat $(ls -1 public/css/*.css | grep -v facebox.css | grep -v pygment_trac.css) > public/css/bundle.css"
 end
 
 desc "Start everything."
