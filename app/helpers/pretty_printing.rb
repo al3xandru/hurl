@@ -12,7 +12,8 @@ module Hurl
         elsif type.include? 'xml'
           pretty_print_xml(content)
         elsif type.include? 'html'
-          colorize :html => content
+#          colorize :html => content
+          content
         else
           content.inspect
         end
@@ -23,15 +24,18 @@ module Hurl
         pretty_print_js Yajl::Encoder.new(:pretty => true).encode(json)
       end
 
+      # disabled colorize
       def pretty_print_js(content)
-        colorize :js => content
+#        colorize :js => content
+        content
       end
 
       def pretty_print_xml(content)
         out = StringIO.new
         doc = REXML::Document.new(content)
         doc.write(out, 2)
-        colorize :xml => out.string
+#        colorize :xml => out.string
+        out.string
       end
 
       def pretty_print_headers(content)

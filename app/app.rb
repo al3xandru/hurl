@@ -20,19 +20,9 @@ module Hurl
       :templates => "#{dir}/templates"
     }
 
-    enable :sessions
-
-    set :github_options, { :client_id    => ENV['HURL_CLIENT_ID'],
-                           :secret       => ENV['HURL_SECRET'],
-                           :scopes       => '',
-                           :callback_url => '/login/callback/' }
-
-    register ::Sinatra::Auth::Github
-
     def initialize(*args)
       super
       @debug = ENV['DEBUG']
-      setup_default_hurls
     end
 
 
@@ -40,91 +30,23 @@ module Hurl
     # routes
     #
 
-    before do
-      if authenticated?
-        @user = User.new(github_user)
-      end
-
-      @flash = session.delete('flash')
-    end
-
     get '/' do
       @hurl = {}
       mustache :index
-    end
-
-    get '/hurls/?' do
-      redirect('/') and return unless logged_in?
-      @hurls = @user.hurls
-      mustache :hurls
-    end
-
-    get '/hurls/:id/?' do
-      @hurl = find_hurl_or_view(params[:id])
-      @hurl ? mustache(:index) : not_found
-    end
-
-    delete '/hurls/:id/?' do
-      redirect('/') and return unless logged_in?
-
-      if @hurl = find_hurl_or_view(params[:id])
-        @user.remove_hurl(@hurl['id'])
-      end
-      request.xhr? ? "ok" : redirect('/')
-    end
-
-    get '/hurls/:id/:view_id/?' do
-      @hurl = find_hurl_or_view(params[:id])
-      @view = find_hurl_or_view(params[:view_id])
-      @view_id = params[:view_id]
-      @hurl && @view ? mustache(:index) : not_found
-    end
-
-    get '/views/:id/?' do
-      @view = find_hurl_or_view(params[:id])
-      @view ? mustache(:view, :layout => false) : not_found
-    end
-
-    get '/test.json' do
-      content_type 'application/json'
-      File.read('test/json')
-    end
-
-    get '/test.xml' do
-      content_type 'application/xml'
-      File.read('test/xml')
     end
 
     get '/about/?' do
       mustache :about
     end
 
-    get '/stats/?' do
-      mustache :stats
-    end
-
-    get '/login/?' do
-      authenticate!
-      redirect '/'
-    end
-
-    get '/login/callback/?' do
-      authenticate!
-      redirect '/'
-    end
-
-    get '/logout/?' do
-      logout!
-      session['flash'] = 'see you later!'
-      redirect '/'
-    end
-
     post '/' do
-      return json(:error => "Calm down and try my margarita!") if rate_limited?
+      return 400, json(:error => "No URL... no job... no worry") unless params[:url]
+      
+#      return json(:error => "Calm down and try my margarita!") if rate_limited?
 
       url, method, auth = params.values_at(:url, :method, :auth)
 
-      return json(:error => "That's... wait.. what?!") if invalid_url?(url)
+      return 403, json(:error => "That's... wait.. what?!") if invalid_url?(url)
 
       curl = Curl::Easy.new(url)
 
@@ -167,19 +89,21 @@ module Hurl
           puts curl.header_str
         end
 
-        header  = pretty_print_headers(curl.header_str)
+        header  = curl.header_str
         type    = url =~ /(\.js)$/ ? 'js' : curl.content_type
-        body    = pretty_print(type, curl.body_str)
+        body    = curl.body_str
         request = pretty_print_requests(sent_headers, post_data)
 
         json :header    => header,
              :body      => body,
-             :request   => request,
-             :hurl_id   => save_hurl(params),
-             :prev_hurl => @user ? @user.second_to_last_hurl_id : nil,
-             :view_id   => save_view(header, body, request)
+             :status_code => curl.response_code,
+             :final_url => curl.last_effective_url,
+             :request   => request
+#             :hurl_id   => save_hurl(params),
+#             :prev_hurl => nil,
+#             :view_id   => save_view(header, body, request)
       rescue => e
-        json :error => e.to_s
+        [500, json(:error => e.to_s)]
       end
     end
 
@@ -189,10 +113,13 @@ module Hurl
     #
 
     not_found do
+      status 404
       mustache :"404"
     end
 
     error do
+      puts "ajung si pe aci?"
+      status 500
       mustache :"500"
     end
 
@@ -239,24 +166,6 @@ module Hurl
       fields
     end
 
-    def save_view(header, body, request)
-      hash = { 'header' => header, 'body' => body, 'request' => request }
-      id = sha(hash.to_s)
-      DB.save(:views, id, hash)
-      id
-    end
-
-    def save_hurl(params)
-      id = sha(params.to_s)
-      DB.save(:hurls, id, params.merge(:id => id))
-      @user.add_hurl(id) if @user
-      id
-    end
-
-    def find_hurl_or_view(id)
-      DB.find(:hurls, id) || DB.find(:views, id)
-    end
-
     # has this person made too many requests?
     def rate_limited?
       false
@@ -274,5 +183,56 @@ module Hurl
         raise "Cannot stringify #{data.inspect}"
       end
     end
+
+#    get '/hurls/?' do
+#      @hurls = DB.dir(:hurls)
+#      mustache :hurls
+#    end
+#
+#    get '/hurls/:id/?' do
+#      @hurl = find_hurl_or_view(params[:id])
+#      @hurl ? mustache(:index) : not_found
+#    end
+#
+#    delete '/hurls/:id/?' do
+#      if @hurl = find_hurl_or_view(params[:id])
+#        @user.remove_hurl(@hurl['id'])
+#      end
+#      request.xhr? ? "ok" : redirect('/')
+#    end
+#
+#    get '/hurls/:id/:view_id/?' do
+#      @hurl = find_hurl_or_view(params[:id])
+#      @view = find_hurl_or_view(params[:view_id])
+#      @view_id = params[:view_id]
+#      @hurl && @view ? mustache(:index) : not_found
+#    end
+#
+#    get '/views/:id/?' do
+#      @view = find_hurl_or_view(params[:id])
+#      @view ? mustache(:view, :layout => false) : not_found
+#    end
+
+#    get '/stats/?' do
+#      mustache :stats
+#    end
+
+#    def save_view(header, body, request)
+#      hash = { 'header' => header, 'body' => body, 'request' => request }
+#      id = sha(hash.to_s)
+#      DB.save(:views, id, hash)
+#      id
+#    end
+#
+#    def save_hurl(params)
+#      id = sha(params.to_s)
+#      DB.save(:hurls, id, params.merge(:id => id))
+#      id
+#    end
+
+#    def find_hurl_or_view(id)
+#      DB.find(:hurls, id) || DB.find(:views, id)
+#    end
+
   end
 end

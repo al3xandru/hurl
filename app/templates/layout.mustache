@@ -13,12 +13,12 @@
     {{^ bundled?}}
       <link rel="stylesheet" type="text/css" href="/css/reset.css">
       <link rel="stylesheet" type="text/css" href="/css/style.css">
-      <link rel="stylesheet" type="text/css" href="/css/pygment_trac.css">
       <link rel="stylesheet" type="text/css" href="/css/jquery.autocomplete.css">
-      <link rel="stylesheet" type="text/css" href="/css/facebox.css">
+      <!--<link rel="stylesheet" type="text/css" href="/css/pygment_trac.css">-->
+      <!--<link rel="stylesheet" type="text/css" href="/css/facebox.css">-->
 
       <script src="/js/jquery.js" type="text/javascript"></script>
-      <script src="/js/facebox.js"type="text/javascript"></script>
+      <!--<script src="/js/facebox.js"type="text/javascript"></script>-->
       <script src="/js/hurl.headers.js" type="text/javascript"></script>
       <script src="/js/hurl.js" type="text/javascript"></script>
       <script src="/js/jquery.autocomplete.js" type="text/javascript"></script>
@@ -31,22 +31,7 @@
 <body>
   <div id="inset">
     <div id="header">
-      <div id="nav">
-        {{# logged_in? }}
-          {{# user}}
-            <a href="/hurls/" class="nav-item">
-              <img src="{{ gravatar_url }}" class="gravatar">
-              {{ login }}'s hurls
-            </a>
-          {{/ user}}
-          <a href="/logout/" class="nav-item">log out</a>
-        {{/ logged_in? }}
-
-        {{^ logged_in?}}
-         <a href="/login/">log in</a> to save your hurls
-        {{/ logged_in?}}
-     </div>
-      <a href="/"><img src="/img/logo.png" title="hurl" /></a>
+      <a href="/">hurl<small>(y)</small></a>
     </div>
     <div id="content">
       <p class="flash-error" style="display: none;">

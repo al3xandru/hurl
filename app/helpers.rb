@@ -1,6 +1,6 @@
 require 'helpers/pretty_printing'
 require 'helpers/sinatra'
-require 'yaml'
+#require 'yaml'
 
 module Hurl
   module Helpers
@@ -66,15 +66,15 @@ module Hurl
 
     # creates the hurls shown on the front page if they're not in the db
     def setup_default_hurls
-      default_hurls.each do |name, params|
-        save_hurl(params)
-      end
+#      default_hurls.each do |name, params|
+#        save_hurl(params)
+#      end
     end
 
-    def default_hurls
-      return @default_hurls if @default_hurls
-      path = File.expand_path(App.root + '/hurls.yaml')
-      @default_hurls = YAML.load_file(path)
-    end
+#    def default_hurls
+#      return @default_hurls if @default_hurls
+#      path = File.expand_path(App.root + '/hurls.yaml')
+#      @default_hurls = YAML.load_file(path)
+#    end
   end
 end
