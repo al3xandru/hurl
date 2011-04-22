@@ -6,8 +6,8 @@
       delay: 40,
       minChars: 1,
       onItemSelect: function(data) {
-        var header=data.value, next = el.siblings('input')
-        var more = Headers[header]
+        var header=data.value, next = el.siblings('input');
+        var more = Headers[header];
         if ( header == "User-Agent" ) {
           next.autocomplete({
             data: keyNames( Headers['User-Agent'] ),
@@ -26,10 +26,10 @@
         next.focus()
       }
     })
-  }
+  };
 
   function keyNames(obj) {
-    var names = []
+    var name, names = [];
     for (name in obj) {
       names.push(name)
     }
@@ -100,7 +100,7 @@
         "Lynx 2.8.4rel.1 on Linux": "Lynx/2.8.4rel.1 libwww-FM/2.14",
         "Googlebot 2.1": "Googlebot/2.1 (+http://www.google.com/bot.html)"
     }
-  }
+  };
 
 
   /*
