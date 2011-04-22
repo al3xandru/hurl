@@ -94,11 +94,14 @@ module Hurl
         body    = curl.body_str
         request = pretty_print_requests(sent_headers, post_data)
 
-        json :header    => header,
-             :body      => body,
-             :status_code => curl.response_code,
-             :final_url => curl.last_effective_url,
-             :request   => request
+        json :header          => header,
+             :body            => body,
+             :status_code     => curl.response_code,
+             :final_url       => curl.last_effective_url,
+             :content_type    => curl.content_type,
+             :request         => request,
+             :request_headers => sent_headers,
+             :request_payload => post_data
 #             :hurl_id   => save_hurl(params),
 #             :prev_hurl => nil,
 #             :view_id   => save_view(header, body, request)
