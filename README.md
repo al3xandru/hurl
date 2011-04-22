@@ -6,6 +6,9 @@ Now Hurl is an open source project for your enjoyment.
 
 <http://hurl.it/>
 
+This is a completely stripped down version, but it returns the results
+unformatted.
+
 
 Installation
 ------------
@@ -56,8 +59,9 @@ Authors
 
 * [Leah Culver][2]
 * [Chris Wanstrath][3]
-
+* [Alex Popescu][4]
 
 [1]: http://r09.railsrumble.com/
 [2]: http://github.com/leah
 [3]: http://github.com/defunkt
+[4]: http://twitter.com/al3xandru
